@@ -34,7 +34,7 @@ export class OrderController {
       try {
         const userId = req.user!.userId;
         const isAdmin = req.user!.role === 'ADMIN';
-        const order = await orderService.getOrderById(req.params.id as string, userId, isAdmin);
+        const order = await orderService.getOrderById(req.params['id'] as string, userId, isAdmin);
         const response: ApiResponse = {
           success: true,
           data: { order },
@@ -77,7 +77,7 @@ export class OrderController {
         const userId = req.user!.userId;
         const role = req.user!.role;
         const order = await orderService.updateOrderStatus(
-          req.params.id as string,
+          req.params['id'] as string,
           req.body.status,
           userId,
           role

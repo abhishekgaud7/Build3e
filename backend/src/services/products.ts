@@ -154,7 +154,10 @@ export class ProductService {
   }
 
   async getCategories(params: { page?: number; limit?: number }) {
-    const { skip, take } = getPaginationParams({ page: params.page, limit: params.limit });
+    const query: any = {};
+    if (params.page !== undefined) query.page = params.page;
+    if (params.limit !== undefined) query.limit = params.limit;
+    const { skip, take } = getPaginationParams(query);
 
     const [categories, total] = await Promise.all([
       prisma.category.findMany({

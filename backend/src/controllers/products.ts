@@ -4,7 +4,7 @@ import { ProductService } from '../services/products';
 import { ApiResponse } from '../types';
 import { createProductSchema, updateProductSchema, productQuerySchema } from '../schemas/products';
 import { validate, validateParams, validateQuery } from '../middleware/validation';
-import { authenticateToken, requireAnyRole, requireRole } from '../middleware/auth';
+import { authenticateToken, requireAnyRole } from '../middleware/auth';
 
 const productService = new ProductService();
 
@@ -29,7 +29,7 @@ export class ProductController {
     validateParams(z.object({ id: z.string().uuid() })),
     async (req: Request, res: Response): Promise<void> => {
       try {
-        const product = await productService.getProductById(req.params.id as string);
+        const product = await productService.getProductById(req.params['id'] as string);
         const response: ApiResponse = {
           success: true,
           data: { product },
@@ -73,7 +73,7 @@ export class ProductController {
         const sellerId = req.user!.userId;
         const isAdmin = req.user!.role === 'ADMIN';
         const product = await productService.updateProduct(
-          req.params.id as string,
+          req.params['id'] as string,
           req.body,
           sellerId,
           isAdmin
@@ -97,7 +97,7 @@ export class ProductController {
       try {
         const sellerId = req.user!.userId;
         const isAdmin = req.user!.role === 'ADMIN';
-        const product = await productService.deleteProduct(req.params.id as string, sellerId, isAdmin);
+        const product = await productService.deleteProduct(req.params['id'] as string, sellerId, isAdmin);
         const response: ApiResponse = {
           success: true,
           data: { product },
@@ -132,7 +132,7 @@ export class ProductController {
     validateParams(z.object({ slug: z.string() })),
     async (req: Request, res: Response): Promise<void> => {
       try {
-        const category = await productService.getCategoryBySlug(req.params.slug as string);
+        const category = await productService.getCategoryBySlug(req.params['slug'] as string);
         const response: ApiResponse = {
           success: true,
           data: { category },

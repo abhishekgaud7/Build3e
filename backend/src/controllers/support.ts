@@ -34,7 +34,7 @@ export class SupportController {
       try {
         const userId = req.user!.userId;
         const isAdmin = req.user!.role === 'ADMIN';
-        const ticket = await supportService.getTicketById(req.params.id as string, userId, isAdmin);
+        const ticket = await supportService.getTicketById(req.params['id'] as string, userId, isAdmin);
         const response: ApiResponse = {
           success: true,
           data: { ticket },
@@ -76,7 +76,7 @@ export class SupportController {
         const userId = req.user!.userId;
         const isAdmin = req.user!.role === 'ADMIN';
         const ticket = await supportService.addMessage({
-          ticketId: req.params.id as string,
+          ticketId: req.params['id'] as string,
           message: req.body.message,
           userId,
           isAdmin,

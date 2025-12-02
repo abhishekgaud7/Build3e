@@ -13,6 +13,13 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
 
   const url = `${BASE_URL}${path}`;
   const res = await fetch(url, { ...init, headers });
+  const contentType = res.headers.get("content-type") || "";
+  if (!res.ok) {
+    throw new Error(`Request failed: ${res.status} ${res.statusText}`);
+  }
+  if (!contentType.includes("application/json")) {
+    throw new Error("Unexpected response type. Is API base URL configured correctly?");
+  }
   const json = (await res.json()) as ApiResponse<T>;
   if (!json.success) {
     const msg = json.error?.message || "Request failed";

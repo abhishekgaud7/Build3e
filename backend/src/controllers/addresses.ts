@@ -32,7 +32,7 @@ export class AddressController {
     async (req: Request, res: Response): Promise<void> => {
       try {
         const userId = req.user!.userId;
-        const address = await addressService.getAddressById(req.params.id as string, userId);
+        const address = await addressService.getAddressById(req.params['id'] as string, userId);
         const response: ApiResponse = {
           success: true,
           data: { address },
@@ -72,7 +72,7 @@ export class AddressController {
     async (req: Request, res: Response): Promise<void> => {
       try {
         const userId = req.user!.userId;
-        const address = await addressService.updateAddress(req.params.id as string, req.body, userId);
+        const address = await addressService.updateAddress(req.params['id'] as string, req.body, userId);
         const response: ApiResponse = {
           success: true,
           data: { address },
@@ -90,7 +90,7 @@ export class AddressController {
     async (req: Request, res: Response): Promise<void> => {
       try {
         const userId = req.user!.userId;
-        const result = await addressService.deleteAddress(req.params.id, userId);
+        const result = await addressService.deleteAddress(req.params['id'] as string, userId);
         const response: ApiResponse = {
           success: true,
           data: result,
