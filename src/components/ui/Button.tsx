@@ -1,7 +1,7 @@
 import * as React from "react";
 
 type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
-  variant?: "default" | "outline" | "ghost";
+  variant?: "default" | "outline" | "ghost" | "secondary" | "destructive";
   size?: "sm" | "md" | "lg";
 };
 
@@ -10,6 +10,8 @@ const variants: Record<string, string> = {
   default: "bg-blue-600 text-white hover:bg-blue-700",
   outline: "border border-gray-300 bg-white text-gray-900 hover:bg-gray-50",
   ghost: "bg-transparent text-gray-900 hover:bg-gray-100",
+  secondary: "bg-gray-100 text-gray-900 hover:bg-gray-200",
+  destructive: "bg-red-600 text-white hover:bg-red-700",
 };
 const sizes: Record<string, string> = {
   sm: "h-9 px-3 py-1 text-sm",
@@ -21,4 +23,3 @@ export function Button({ variant = "default", size = "md", className, ...props }
   const cls = [base, variants[variant], sizes[size], className].filter(Boolean).join(" ");
   return <button className={cls} {...props} />;
 }
-

@@ -15,8 +15,12 @@ export function CardTitle({ className, ...props }: React.HTMLAttributes<HTMLHead
   return <h3 className={cls} {...props} />;
 }
 
+export function CardDescription({ className, ...props }: React.HTMLAttributes<HTMLParagraphElement>) {
+  const cls = ["text-sm text-gray-500", className].filter(Boolean).join(" ");
+  return <p className={cls} {...props} />;
+}
+
 export function CardContent({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   const cls = ["p-4", className].filter(Boolean).join(" ");
   return <div className={cls} {...props} />;
 }
-

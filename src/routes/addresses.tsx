@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/contexts/AuthContext'
 import { Button, Card, CardContent, CardHeader, CardTitle, Input, Badge } from '@/components/ui'
+import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { 
   MapPin, 
