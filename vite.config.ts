@@ -2,11 +2,18 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tsconfigPaths from "vite-tsconfig-paths";
 import { traeBadgePlugin } from 'vite-plugin-trae-solo-badge';
+import { fileURLToPath } from 'node:url'
+import { dirname, resolve as pathResolve } from 'node:path'
 
 // https://vite.dev/config/
 export default defineConfig({
   build: {
     sourcemap: 'hidden',
+  },
+  resolve: {
+    alias: {
+      '@': pathResolve(dirname(fileURLToPath(import.meta.url)), './src'),
+    },
   },
   plugins: [
     react({
