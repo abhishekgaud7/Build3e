@@ -28,20 +28,27 @@ export const RegisterPage: React.FC = () => {
       return;
     }
 
+    const phoneDigitsOnly = formData.phone.replace(/\D/g, "");
+    if (phoneDigitsOnly.length !== 10) {
+      toast.error("Phone must be 10 digits");
+      return;
+    }
+
     setLoading(true);
 
     try {
       await register({
         name: formData.name,
         email: formData.email,
-        phone: formData.phone,
+        phone: phoneDigitsOnly,
         role: formData.role,
         password: formData.password
       });
       toast.success("Registration successful!");
       navigate("/");
     } catch (error) {
-      toast.error("Registration failed. Email may already exist.");
+      const msg = (error as Error)?.message || "Registration failed";
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
@@ -118,7 +125,7 @@ export const RegisterPage: React.FC = () => {
                   onChange={handleChange}
                   required
                   className="mt-1"
-                  placeholder="Enter your phone number"
+                  placeholder="Enter 10-digit phone number"
                 />
               </div>
 
@@ -149,6 +156,7 @@ export const RegisterPage: React.FC = () => {
                   value={formData.password}
                   onChange={handleChange}
                   required
+                  minLength={8}
                   className="mt-1"
                   placeholder="Create a password"
                 />
