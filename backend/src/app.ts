@@ -1,0 +1,72 @@
+import express from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
+import { config } from './config';
+import { errorHandler } from './middleware/error';
+import prisma from './db';
+import authRoutes from './routes/auth';
+import productRoutes from './routes/products';
+import addressRoutes from './routes/addresses';
+import orderRoutes from './routes/orders';
+import supportRoutes from './routes/support';
+
+export function createApp(): express.Application {
+  const app = express();
+
+  app.use(helmet());
+  const allowedExact = new Set([
+    config.frontendUrl,
+  ]);
+  const vercelWildcard = /^https:\/\/.*\.vercel\.app$/;
+  const localhostWildcard = /^https?:\/\/localhost(?::\d+)?$/;
+  app.use(cors({
+    origin(origin, callback) {
+      if (!origin) return callback(null, true);
+      if (allowedExact.has(origin) || vercelWildcard.test(origin) || localhostWildcard.test(origin)) {
+        return callback(null, true);
+      }
+      return callback(new Error('CORS: Origin not allowed'));
+    },
+    credentials: true,
+  }));
+  app.use(express.json({ limit: '10mb' }));
+  app.use(express.urlencoded({ extended: true }));
+
+  app.get('/health', (_req, res) => {
+    res.json({ status: 'ok', timestamp: new Date().toISOString() });
+  });
+
+  app.get('/health/db', async (_req, res) => {
+    try {
+      await prisma.$queryRaw`SELECT 1`;
+      const dbUrl = config.databaseUrl;
+      let host = undefined as string | undefined;
+      let database = undefined as string | undefined;
+      try {
+        const u = new URL(dbUrl);
+        host = u.hostname;
+        database = u.pathname.replace(/^\//, '');
+      } catch {}
+      res.json({ status: 'ok', db: { host, database } });
+    } catch (e) {
+      res.status(500).json({ status: 'error' });
+    }
+  });
+
+  app.use('/api/auth', authRoutes);
+  app.use('/api/products', productRoutes);
+  app.use('/api/addresses', addressRoutes);
+  app.use('/api/orders', orderRoutes);
+  app.use('/api/support', supportRoutes);
+
+  app.use(errorHandler);
+
+  app.use('*', (_req, res) => {
+    res.status(404).json({
+      success: false,
+      error: { message: 'Route not found' },
+    });
+  });
+
+  return app;
+}
