@@ -15,15 +15,13 @@ export function createApp(): express.Application {
   app.use(helmet());
   const allowedExact = new Set([
     config.frontendUrl,
-    'http://localhost:5173',
-    'http://localhost:3000',
-    'https://localhost:5173',
   ]);
   const vercelWildcard = /^https:\/\/.*\.vercel\.app$/;
+  const localhostWildcard = /^https?:\/\/localhost(?::\d+)?$/;
   app.use(cors({
     origin(origin, callback) {
       if (!origin) return callback(null, true);
-      if (allowedExact.has(origin) || vercelWildcard.test(origin)) {
+      if (allowedExact.has(origin) || vercelWildcard.test(origin) || localhostWildcard.test(origin)) {
         return callback(null, true);
       }
       return callback(new Error('CORS: Origin not allowed'));
