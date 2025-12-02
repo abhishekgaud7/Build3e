@@ -13,8 +13,21 @@ export function createApp(): express.Application {
   const app = express();
 
   app.use(helmet());
+  const allowedExact = new Set([
+    config.frontendUrl,
+    'http://localhost:5173',
+    'http://localhost:3000',
+    'https://localhost:5173',
+  ]);
+  const vercelWildcard = /^https:\/\/.*\.vercel\.app$/;
   app.use(cors({
-    origin: config.frontendUrl,
+    origin(origin, callback) {
+      if (!origin) return callback(null, true);
+      if (allowedExact.has(origin) || vercelWildcard.test(origin)) {
+        return callback(null, true);
+      }
+      return callback(new Error('CORS: Origin not allowed'));
+    },
     credentials: true,
   }));
   app.use(express.json({ limit: '10mb' }));
