@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import { config } from './config';
 import { errorHandler } from './middleware/error';
+import prisma from './db';
 import authRoutes from './routes/auth';
 import productRoutes from './routes/products';
 import addressRoutes from './routes/addresses';
@@ -33,6 +34,23 @@ export function createApp(): express.Application {
 
   app.get('/health', (_req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
+  });
+
+  app.get('/health/db', async (_req, res) => {
+    try {
+      await prisma.$queryRaw`SELECT 1`;
+      const dbUrl = config.databaseUrl;
+      let host = undefined as string | undefined;
+      let database = undefined as string | undefined;
+      try {
+        const u = new URL(dbUrl);
+        host = u.hostname;
+        database = u.pathname.replace(/^\//, '');
+      } catch {}
+      res.json({ status: 'ok', db: { host, database } });
+    } catch (e) {
+      res.status(500).json({ status: 'error' });
+    }
   });
 
   app.use('/api/auth', authRoutes);
