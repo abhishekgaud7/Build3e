@@ -1,5 +1,5 @@
 const envBase = import.meta.env.VITE_API_BASE_URL as string | undefined;
-const BASE_URL = envBase && envBase.length > 0 ? envBase.replace(/\/$/, "") : ""; // same-origin by default
+const BASE_URL = envBase && envBase.length > 0 ? envBase.replace(/\/$/, "") : "";
 
 type ApiResponse<T> = { success: boolean; data?: T; error?: { message: string } };
 
@@ -7,18 +7,30 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   const token = localStorage.getItem("token");
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
+    "Accept": "application/json",
     ...(init.headers as Record<string, string> | undefined),
   };
   if (token) headers["Authorization"] = `Bearer ${token}`;
 
   const url = `${BASE_URL}${path}`;
-  const res = await fetch(url, { ...init, headers });
+  let res: Response;
+  try {
+    res = await fetch(url, { ...init, headers });
+  } catch (e) {
+    const reason = (e as Error)?.message || "Unknown";
+    throw new Error(`Network error calling ${url}: ${reason}`);
+  }
   const contentType = res.headers.get("content-type") || "";
   if (!res.ok) {
-    throw new Error(`Request failed: ${res.status} ${res.statusText}`);
+    let detail = "";
+    try {
+      const body = await res.text();
+      detail = body?.slice(0, 200) || "";
+    } catch {}
+    throw new Error(`Request failed ${res.status} ${res.statusText} at ${url}${detail ? `: ${detail}` : ""}`);
   }
   if (!contentType.includes("application/json")) {
-    throw new Error("Unexpected response type. Is API base URL configured correctly?");
+    throw new Error(`Unexpected response content-type from ${url}. Set VITE_API_BASE_URL to your backend origin.`);
   }
   const json = (await res.json()) as ApiResponse<T>;
   if (!json.success) {
