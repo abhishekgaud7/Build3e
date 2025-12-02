@@ -1,6 +1,5 @@
 import { OrderService } from '../../src/services/orders';
 import prisma from '../../src/db';
-import { AppError } from '../../src/middleware/error';
 
 jest.mock('../../src/db', () => ({
   product: {

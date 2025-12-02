@@ -1,4 +1,5 @@
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
+const envBase = import.meta.env.VITE_API_BASE_URL as string | undefined;
+const BASE_URL = envBase && envBase.length > 0 ? envBase.replace(/\/$/, "") : ""; // same-origin by default
 
 type ApiResponse<T> = { success: boolean; data?: T; error?: { message: string } };
 
@@ -10,7 +11,8 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   };
   if (token) headers["Authorization"] = `Bearer ${token}`;
 
-  const res = await fetch(`${BASE_URL}${path}`, { ...init, headers });
+  const url = `${BASE_URL}${path}`;
+  const res = await fetch(url, { ...init, headers });
   const json = (await res.json()) as ApiResponse<T>;
   if (!json.success) {
     const msg = json.error?.message || "Request failed";
